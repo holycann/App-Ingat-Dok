@@ -5,6 +5,7 @@ export interface User {
   role: string;
   username: string;
   fullname: string;
+  address: string;
   preferences: {
     theme: "light" | "dark" | "system";
     notifications: boolean;

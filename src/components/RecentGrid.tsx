@@ -18,6 +18,8 @@ export default function RecentGrid() {
   const { documents, deleteDocument } = useDocumentStore();
   const [showMenu, setShowMenu] = useState<string | null>(null);
 
+  console.log("DOCUMENTS:", documents);
+
   const getStatusColor = (status: Document["status"]) => {
     switch (status) {
       case "completed":
@@ -48,34 +50,34 @@ export default function RecentGrid() {
     }
   };
 
-  const formatDate = (date: Date) => {
+  const formatDate = (date: string) => {
     return new Intl.DateTimeFormat("id-ID", {
       day: "numeric",
       month: "short",
       year: "numeric",
-    }).format(date);
+    }).format(new Date(date));
   };
 
-  const formatExpiryTime = (expiryDate: Date) => {
+  const formatExpiryTime = (expiryDate: string) => {
     const now = new Date();
     const expiry = new Date(expiryDate);
-    
+
     const diffTime = expiry.getTime() - now.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays <= 0) return "Expired";
-    
+
     const years = Math.floor(diffDays / 365);
     const remainingDays = diffDays % 365;
     const months = Math.floor(remainingDays / 30);
     const days = remainingDays % 30;
-    
-    let result = '';
-    if (years > 0) result += `${years} tahun `;
-    if (months > 0) result += `${months} bulan `;
-    if (days > 0) result += `${days} hari`;
-    
-    return result.trim();
+
+    const parts = [];
+    if (years > 0) parts.push(`${years} tahun`);
+    if (months > 0) parts.push(`${months} bulan`);
+    if (days > 0) parts.push(`${days} hari`);
+
+    return parts.join(" ");
   };
 
   const handleDelete = async (id: string) => {
@@ -109,8 +111,8 @@ export default function RecentGrid() {
             {/* Document preview */}
             <div className="aspect-[4/3] bg-ui_elements-input_background relative ">
               <img
-                src={document.thumbnailUrl || document.url}
-                alt={document.title}
+                src={document.file_path || ""}
+                alt={document.name}
                 className="w-full h-full object-cover"
               />
 
@@ -163,20 +165,20 @@ export default function RecentGrid() {
                 <div className="min-w-0 flex-1">
                   <Link href={`/documents/${document.id}`}>
                     <h3 className="text-sm font-medium text-typography-heading_color truncate hover:text-primary-brand_yellow cursor-pointer transition-colors">
-                      {document.title}
+                      {document.name}
                     </h3>
                   </Link>
 
-                  {document.expiryDate && (
+                  {document.expired_date && (
                     <div className="flex items-center space-x-4 mt-2 text-xs text-text-muted_gray">
                       <div className="flex items-center space-x-1">
                         <Calendar className="h-3 w-3" />
-                        <span>Exp: {formatDate(document.expiryDate)}</span>
+                        <span>Exp: {formatDate(document.expired_date)}</span>
                       </div>
 
                       <div className="flex items-center space-x-1">
                         <Clock className="h-3 w-3" />
-                        <span>{formatExpiryTime(document.expiryDate)}</span>
+                        <span>{formatExpiryTime(document.expired_date)}</span>
                       </div>
                     </div>
                   )}

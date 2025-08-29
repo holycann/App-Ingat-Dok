@@ -3,6 +3,7 @@ import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import Sidebar from "@/components/Sidebar";
 import "./globals.css";
+import Background from "@/components/Background";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -43,6 +44,7 @@ export default function RootLayout({
                 <div className="flex h-full w-full flex-1 flex-col gap-2 rounded-2xl border border-neutral-200 bg-white p-2 dark:border-neutral-700 dark:bg-neutral-900">
                   <main className="w-full h-full border rounded-2xl overflow-y-auto overscroll-contain">
                     <div className="p-4 h-full overflow-y-auto overscroll-contain">
+                      <Background />
                       {children}
                     </div>
                   </main>

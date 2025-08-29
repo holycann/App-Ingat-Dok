@@ -1,14 +1,24 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import UploadCard from "@/components/UploadCard";
 import InfoSection from "@/components/InfoSection";
 import { motion, AnimatePresence } from "framer-motion";
 import RecentGrid from "@/components/RecentGrid";
+import { useDocumentStore } from "@/store/documentStore";
 
 export default function Home() {
+  const { fetchDocuments } = useDocumentStore();
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [showInfoSection, setShowInfoSection] = useState(false);
+
+  const getDocuments = useCallback(async () => {
+    await fetchDocuments();
+  }, [fetchDocuments]);
+
+  useEffect(() => {
+    getDocuments();
+  }, []);
 
   const handleFilesUploaded = (files: File[]) => {
     setUploadedFiles(files);
@@ -28,12 +38,6 @@ export default function Home() {
 
   return (
     <div className="relative">
-      <div className="absolute inset-0 pointer-events-none ">
-        <div className="absolute top-0 left-0 w-[300px] h-[200px] bg-gradient-to-r from-background-gradient_blue_start/50 to-transparent rounded-full blur-3xl origin-top-left"></div>
-        <div className="absolute top-0 right-0 w-[300px] h-[200px] bg-gradient-to-l from-background-gradient_blue_mid/50 to-transparent rounded-full blur-3xl origin-top-right"></div>
-        <div className="absolute bottom-0 left-0 w-[300px] h-[200px] bg-gradient-to-r from-background-gradient_teal/50 to-transparent rounded-full blur-3xl origin-bottom-left"></div>
-        <div className="absolute bottom-0 right-0 w-[300px] h-[200px] bg-gradient-to-l from-background-gradient_green_end/50 to-transparent rounded-full blur-3xl origin-bottom-right"></div>
-      </div>
       <main className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Hero Section */}
         <div className="text-center mb-12">

@@ -2,17 +2,14 @@ import { DocumentType, DocumentTypeFields } from "./DocumentType";
 
 export interface Document {
   id: string;
-  title: string;
+  name: string;
+  doc_type_id: string;
+  file_path: string;
+  user_id: string;
+  status: string;
+  expired_date: string;
+
   type: DocumentType;
-  uploadedAt: Date;
-  expiryDate?: Date;
-  status: "uploaded" | "processing" | "completed" | "expired";
-  url: string;
-  thumbnailUrl?: string;
-  extractedData?: DocumentTypeFields;
-  fileSize: number;
-  mimeType: string;
-  userId?: string;
 }
 
 export interface ProcessingJob {

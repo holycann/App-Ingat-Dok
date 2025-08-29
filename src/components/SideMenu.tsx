@@ -49,7 +49,6 @@ const useMenuLinks = () => {
 
   const bottomLinks = useMemo<MenuLink[]>(
     () => [
-      createMenuLinkConfig("Settings", "/settings", Settings),
       createMenuLinkConfig("Logout", "/logout", LogOut),
     ],
     []

@@ -1,54 +1,57 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useCallback } from "react"
-import { Upload, FileText, ImageIcon, AlertCircle, X } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { useDocumentStore } from "@/store/documentStore"
-import { useNotificationStore } from "@/store/notificationStore"
-import { motion, AnimatePresence } from "framer-motion"
+import { useState, useCallback } from "react";
+import { Upload, FileText, ImageIcon, AlertCircle, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useDocumentStore } from "@/store/documentStore";
+import { useNotificationStore } from "@/store/notificationStore";
+import { motion, AnimatePresence } from "framer-motion";
 
-export default function UploadCard({ 
+export default function UploadCard({
   onFilesUploaded,
-  onContinue
-}: { 
+  onContinue,
+}: {
   onFilesUploaded?: (files: File[]) => void;
   onContinue?: () => void;
 }) {
-  const [isDragOver, setIsDragOver] = useState(false)
-  const [isUploading, setIsUploading] = useState(false)
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
-  const { uploadDocument } = useDocumentStore()
-  const { addNotification } = useNotificationStore()
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const { uploadDocument } = useDocumentStore();
+  const { addNotification } = useNotificationStore();
 
-  const MAX_FILES = 5
-  const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
+  const MAX_FILES = 5;
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragOver(true)
-  }, [])
+    e.preventDefault();
+    setIsDragOver(true);
+  }, []);
 
   const handleDragLeave = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragOver(false)
-  }, [])
+    e.preventDefault();
+    setIsDragOver(false);
+  }, []);
 
   const handleDrop = useCallback(async (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragOver(false)
+    e.preventDefault();
+    setIsDragOver(false);
 
-    const files = Array.from(e.dataTransfer.files)
-    handleFilesSelection(files)
-  }, [])
+    const files = Array.from(e.dataTransfer.files);
+    handleFilesSelection(files);
+  }, []);
 
-  const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files
-    if (files && files.length > 0) {
-      handleFilesSelection(Array.from(files))
-    }
-  }, [])
+  const handleFileSelect = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const files = e.target.files;
+      if (files && files.length > 0) {
+        handleFilesSelection(Array.from(files));
+      }
+    },
+    []
+  );
 
   const handleFilesSelection = (files: File[]) => {
     if (selectedFiles.length + files.length > MAX_FILES) {
@@ -57,22 +60,22 @@ export default function UploadCard({
         title: "Terlalu banyak file",
         message: `Maksimal ${MAX_FILES} file yang diizinkan`,
         isRead: false,
-      })
-      return
+      });
+      return;
     }
 
-    const validFiles: File[] = []
-    const invalidFiles: string[] = []
+    const validFiles: File[] = [];
+    const invalidFiles: string[] = [];
 
-    files.forEach(file => {
+    files.forEach((file) => {
       if (!file.type.startsWith("image/") && file.type !== "application/pdf") {
-        invalidFiles.push(`${file.name} (format tidak didukung)`)
+        invalidFiles.push(`${file.name} (format tidak didukung)`);
       } else if (file.size > MAX_FILE_SIZE) {
-        invalidFiles.push(`${file.name} (melebihi 5MB)`)
+        invalidFiles.push(`${file.name} (melebihi 5MB)`);
       } else {
-        validFiles.push(file)
+        validFiles.push(file);
       }
-    })
+    });
 
     if (invalidFiles.length > 0) {
       addNotification({
@@ -80,32 +83,32 @@ export default function UploadCard({
         title: "Beberapa file tidak dapat diunggah",
         message: invalidFiles.join(", "),
         isRead: false,
-      })
+      });
     }
 
     if (validFiles.length > 0) {
-      setSelectedFiles(prev => [...prev, ...validFiles])
-      
+      setSelectedFiles((prev) => [...prev, ...validFiles]);
+
       // Notify parent component about file upload
       if (onFilesUploaded) {
-        onFilesUploaded([...selectedFiles, ...validFiles])
+        onFilesUploaded([...selectedFiles, ...validFiles]);
       }
     }
-  }
+  };
 
   const handleRemoveFile = (index: number) => {
-    setSelectedFiles(files => {
-      const newFiles = [...files]
-      newFiles.splice(index, 1)
-      
+    setSelectedFiles((files) => {
+      const newFiles = [...files];
+      newFiles.splice(index, 1);
+
       // Notify parent component about file update
       if (onFilesUploaded) {
-        onFilesUploaded(newFiles)
+        onFilesUploaded(newFiles);
       }
-      
-      return newFiles
-    })
-  }
+
+      return newFiles;
+    });
+  };
 
   const handleContinue = async () => {
     if (selectedFiles.length === 0) {
@@ -114,28 +117,28 @@ export default function UploadCard({
         title: "Tidak ada file",
         message: "Silakan pilih minimal satu file untuk diunggah",
         isRead: false,
-      })
-      return
+      });
+      return;
     }
 
-    setIsUploading(true)
+    setIsUploading(true);
     try {
       // Upload all selected files
-      const uploadPromises = selectedFiles.map(file => uploadDocument(file))
-      await Promise.all(uploadPromises)
-      
+      const uploadPromises = selectedFiles.map((file) => uploadDocument(file));
+      await Promise.all(uploadPromises);
+
       addNotification({
         type: "success",
         title: "Upload berhasil",
         message: `${selectedFiles.length} file berhasil diunggah`,
         isRead: false,
-      })
-      
+      });
+
       // Notify parent component about successful upload
       if (onFilesUploaded) {
-        onFilesUploaded(selectedFiles)
+        onFilesUploaded(selectedFiles);
       }
-      
+
       // Proceed to next step
       if (onContinue) {
         onContinue();
@@ -146,24 +149,26 @@ export default function UploadCard({
         title: "Upload gagal",
         message: "Terjadi kesalahan saat mengupload file",
         isRead: false,
-      })
+      });
     } finally {
-      setIsUploading(false)
+      setIsUploading(false);
     }
-  }
+  };
 
   const handleClearFiles = () => {
-    setSelectedFiles([])
-    
+    setSelectedFiles([]);
+
     // Notify parent component about cleared files
     if (onFilesUploaded) {
-      onFilesUploaded([])
+      onFilesUploaded([]);
     }
-  }
+  };
 
   return (
     <div className="bg-cards-card_background rounded-xl p-6 shadow-lg border border-cards-card_border h-full">
-      <h3 className="text-lg font-semibold mb-4 text-typography-heading_color">Upload File</h3>
+      <h3 className="text-typography-heading_color text-lg font-semibold mb-4">
+        Upload File
+      </h3>
 
       {selectedFiles.length === 0 ? (
         <motion.div
@@ -199,7 +204,7 @@ export default function UploadCard({
                 Drag & drop file atau klik untuk memilih
               </p>
               <p className="text-sm text-text-muted_gray">
-                Mendukung JPG, PNG, PDF (max 5MB per file, max 5 file)
+                Mendukung JPG, JPEG, PNG (max 5MB per file, max 5 file)
               </p>
             </div>
 
@@ -220,7 +225,10 @@ export default function UploadCard({
               disabled={isUploading}
               className="mt-4 bg-navigation-button_yellow hover:bg-navigation-button_hover text-navigation-nav_background border-navigation-button_yellow"
             >
-              <label htmlFor="file-upload" className="cursor-pointer">
+              <label
+                htmlFor="file-upload"
+                className="cursor-pointer text-text-primary_white"
+              >
                 <FileText className="h-5 w-5 mr-2" />
                 Pilih File
               </label>
@@ -245,24 +253,28 @@ export default function UploadCard({
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 20 }}
-                    className="flex items-center justify-between bg-white dark:bg-gray-800 p-3 rounded-md shadow-sm"
+                    className="flex items-center justify-between bg-cards-card_background dark:bg-background-dark_teal p-3 rounded-md shadow-sm"
                   >
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded flex items-center justify-center">
+                      <div className="w-10 h-10 bg-ui_elements-input_background rounded flex items-center justify-center">
                         {file.type.startsWith("image/") ? (
-                          <ImageIcon className="h-5 w-5 text-gray-500" />
+                          <ImageIcon className="h-5 w-5 text-text-muted_gray" />
                         ) : (
-                          <FileText className="h-5 w-5 text-gray-500" />
+                          <FileText className="h-5 w-5 text-text-muted_gray" />
                         )}
                       </div>
                       <div>
-                        <p className="text-sm font-medium truncate max-w-[200px]">{file.name}</p>
-                        <p className="text-xs text-gray-500">{(file.size / 1024).toFixed(1)} KB</p>
+                        <p className="text-sm font-medium truncate max-w-[200px] text-typography-heading_color">
+                          {file.name}
+                        </p>
+                        <p className="text-xs text-text-muted_gray">
+                          {(file.size / 1024).toFixed(1)} KB
+                        </p>
                       </div>
                     </div>
                     <button
                       onClick={() => handleRemoveFile(index)}
-                      className="text-gray-400 hover:text-red-500"
+                      className="text-text-muted_gray hover:text-cards-critical_tag"
                       aria-label="Hapus file"
                     >
                       <X className="h-5 w-5" />
@@ -278,11 +290,11 @@ export default function UploadCard({
               variant="outline"
               onClick={handleClearFiles}
               disabled={isUploading}
-              className="border-gray-300 hover:bg-gray-100"
+              className="border-cards-card_border hover:bg-ui_elements-input_background text-typography-heading_color"
             >
               Clear All Files
             </Button>
-            
+
             <div className="flex items-center space-x-3">
               <input
                 type="file"
@@ -293,24 +305,24 @@ export default function UploadCard({
                 disabled={isUploading || selectedFiles.length >= MAX_FILES}
                 multiple
               />
-              
+
               {selectedFiles.length < MAX_FILES && (
                 <Button
                   asChild
                   variant="outline"
                   disabled={isUploading}
-                  className="border-primary-brand_green hover:bg-primary-brand_green/10"
+                  className="border-primary-brand_green hover:bg-primary-brand_green/10 text-primary-brand_green"
                 >
                   <label htmlFor="add-more-files" className="cursor-pointer">
                     Add More
                   </label>
                 </Button>
               )}
-              
+
               <Button
                 onClick={handleContinue}
                 disabled={isUploading}
-                className="bg-primary-brand_yellow hover:bg-navigation-button_hover text-navigation-nav_background"
+                className="bg-navigation-button_yellow hover:bg-navigation-button_hover text-navigation-nav_background"
               >
                 {isUploading ? "Uploading..." : "Continue"}
               </Button>
@@ -330,5 +342,5 @@ export default function UploadCard({
         </div>
       </div>
     </div>
-  )
+  );
 }
