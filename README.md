@@ -24,7 +24,7 @@ App Ingat Dok is a cutting-edge web application designed to streamline your docu
 - Go: Backend programming language for building scalable and efficient server-side applications.
 
 🌐 **Project Status:**
-The project is currently live at (https://app.ingatdok.kawasan.digital/)[App IngatDok]. However, please note that the application is not fully functional yet, as it is still awaiting backend integration. We are actively working on completing the backend connections to provide a fully operational document management experience.
+The project is currently live at [App IngatDok](https://app.ingatdok.kawasan.digital/). However, please note that the application is not fully functional yet, as it is still awaiting backend integration. We are actively working on completing the backend connections to provide a fully operational document management experience.
 
 🔒 **Security First:** App-Ingat-Dok follows best practices in software design, ensuring a secure and scalable application that prioritizes user data protection.
 
